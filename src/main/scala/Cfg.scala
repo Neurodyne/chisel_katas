@@ -14,10 +14,14 @@ package object Cfg {
   val qin  = 10
   val qout = 10
   
-  val inType  = SInt(dwin.W)
-  val outType = SInt(dwout.W)
-  //val inType  = FP ( dwin.W , qin.BP  )
-  //val outType = FP ( dwout.W, qout.BP )
+  //val inType  = SInt(dwin.W)
+  //val outType = SInt(dwout.W)
+  //val inType  = UInt(dwin.W)
+  //val outType = UInt(dwout.W)
+  val inType  = FP ( dwin.W , qin.BP  )
+  val outType = FP ( dwout.W, qout.BP )
+  //val inType  = Complex (UInt(dwin.W), UInt(dwin.W))
+  //val outType = Complex (UInt(dwin.W), UInt(dwin.W))
   //val inType  = Complex ( FP(dwin.W , qin.BP  ), FP(dwin.W , qin.BP  ))
   //val outType = Complex ( FP(dwout.W, qout.BP ), FP(dwout.W, qout.BP ))
   
