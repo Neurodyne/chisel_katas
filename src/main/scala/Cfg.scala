@@ -18,14 +18,16 @@ package object Cfg {
   //val outType = SInt(dwout.W)
   //val inType  = UInt(dwin.W)
   //val outType = UInt(dwout.W)
-  val inType  = FP ( dwin.W , qin.BP  )
-  val outType = FP ( dwout.W, qout.BP )
-  //val inType  = Complex (UInt(dwin.W), UInt(dwin.W))
-  //val outType = Complex (UInt(dwin.W), UInt(dwin.W))
-  //val inType  = Complex ( FP(dwin.W , qin.BP  ), FP(dwin.W , qin.BP  ))
-  //val outType = Complex ( FP(dwout.W, qout.BP ), FP(dwout.W, qout.BP ))
+  //val inType  = FP ( dwin.W , qin.BP  )
+  //val outType = FP ( dwout.W, qout.BP )
   
-  val inZero  = 0.U(inType.getWidth.W).asTypeOf(inType)
-  val outZero = 0.U(outType.getWidth.W).asTypeOf(outType)
+  
+  //val inType  = Complex (UInt(dwin.W), UInt(dwin.W))
+  //val outType = Complex (UInt(dwout.W), UInt(dwout.W))
+  //val inType  = Complex (SInt(dwin.W) , SInt(dwin.W))
+  //val outType = Complex (SInt(dwout.W), SInt(dwout.W))
+  val inType  = Complex ( FP(dwin.W , qin.BP  ), FP(dwin.W , qin.BP  ))
+  val outType = Complex ( FP(dwout.W, qout.BP ), FP(dwout.W, qout.BP ))
+  
 }
 

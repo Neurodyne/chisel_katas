@@ -15,8 +15,13 @@ object Complex {
     new Complex(real,imag)
   }
   
-  def zero = Complex (0.U,0.U)
-  def one  = Complex (1.U,0.U)
+  // This translates Chisel Types into Hardware Types
+  def wire[A <: Data, B <: Data](re: A, im: B): Complex[A,B] = {
+    val res = Wire(Complex(re.cloneType, im.cloneType))
+    res.re := re
+    res.im := im
+    res
+  }
   
 }
 
