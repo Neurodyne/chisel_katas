@@ -30,77 +30,36 @@ class Counter(size: Int) extends Module {
   io.out := tmp
 }
 
-class AddrDecoder (addrWidth:Int, mmap:LinkedHashMap[UInt, (UInt, UInt)]) extends Module {
- 
-  val size  = mmap.size 
-  require (size > 0, "Empty map passed")
+sealed class AddrDecoder[A <: Data, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:C[A], addrWidth:Int) extends Module {
+
+  val bsize  = baseSeq.size 
+  val ssize  = sizeSeq.size 
+  require (bsize > 0, "Empty map passed")
+  require (bsize == ssize, "Invalid initialization of AddrDecoder")
   
   val io = IO (new Bundle {
     val addr    = Input (UInt(addrWidth.W))      
     val en      = Input (Bool())  
-    val sel     = Output(Vec(size,Bool()))  // $onehot0 selector
+    val sel     = Output(Vec(bsize,Bool()))  // $onehot0 selector
   })
 
-  // Curried function which accepts a tuple and an input addr
-  def inside (range:(UInt,UInt))(addr:UInt):Bool = {
-    addr >= range._1 && addr < range._1 + range._2
+  def inside():Bool = {
+    import scala.math.Ordered._
+    true.B
   }
 
-  // MUX output
-  //for (i <- 0 until size) {
-  //  io.sel(i) := false.B
-  //}
+  baseSeq zip io.sel foreach { case(base, port) =>
+    
+    when (inside()) {
+      port := true.B
+    }
+    .otherwise {
+      port := false.B
+    }
+    
+  } 
 
-  // Loop thru the Memory Map, pair with index and evaluate logic value for io.sel
-  //mmap.zipWithIndex foreach { case (entry,idx) =>
-
-  //  when (io.en && inside(entry)(io.addr)) {
-  //    io.sel(idx) := true.B
-
-  //  } .otherwise {
-  //    io.sel(idx) := false.B
-  //  }
-  //  
-  //}    
-  //for ((k,v) <- mmap) 
-  //  if (inside(k,v)(io.addr))
-  //    yield ()
-
-  //io.sel := Mux1H ( (for((k,v) <- mmap ) yield inside ((k,v))(io.addr)) ) 
-  //io.sel := Mux1H ( mmap map { case (k,v) => inside(k,v)(io.addr)}) 
-  //for ((k,v) <- mmap) 
-  //  if(inside(k,v)(io.addr))
-  //    yield (io.sel(0) := true.B)
-  //  else 
-  //    yield (io.sel(0) := false.B)
- 
-  //for (i <- 0 until size)
-  //  io.sel(i) := false.B
-   
-  //for ((k,v) <- mmap) {
-  //  if (inside(v)(io.addr) == true.B)
-  //    io.sel(k) := true.B
-  //  else
-  //    io.sel(k) := false.B
-  //  
-  //}
- 
-  //for ((k,v) <- mmap) {
-  //  io.sel(k) :=  when ( inside(v)(io.addr) ) { true.B }
-  //                .otherwise { false.B }
- 
-  for (i <- 0 until size)
-    if ( inside(mmap(i.asUInt))(io.addr) == true.B )
-      io.sel(i) :=  true.B 
-    else 
-      io.sel(i) := false.B
-                    
-
-  //io.sel map { p => 
-  //  if ( for(k,v) <- mmap) inside()
-  //}
-  //
-  //// $onehot0 output encoding check
+  // $onehot0 output encoding check
   //assert (PopCount(io.sel) <= 1.U, "Invalid addr decoding")
 }
 

@@ -1,7 +1,7 @@
 package my_pkg
 
 import chisel3._
-import Cfg._
+//import Cfg._
 import complex_pkg._
 import ring_pkg._
 
@@ -34,7 +34,7 @@ class Dummy[A <: Data:Ring] (dType: A) extends Module {
 
 
 // DSP top wrapper
-class DspTop extends Module  {
+class DspTop[A <: Data:Ring, B <: Data:Ring] (inType:A, outType:B) extends Module  {
 
   val io = IO(new Bundle {
 

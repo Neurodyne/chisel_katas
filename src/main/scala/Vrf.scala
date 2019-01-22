@@ -32,26 +32,13 @@ class Vrf[T <: Data] (dType:T, banks:Int, addrWidth:Int) extends Module {
   // RAM banks
   val mem  = Seq.fill(banks) { SyncReadMem(depth, dType) }
 
-  //val maptmp  = Map (0.U -> depth - 1.U)
-  //for (i <- 0 until banks)
-  //  code
- 
   //val mmap  = Map ( 0x0.U -> 0x1.U, 
   //                  0x2.U -> 0x3.U)
-  //val mmap  = LinkedHashMap[UInt,UInt] ()
-  //mmap += (0x0.U -> (depth.U - 1.U))
-  //mmap += (depth.U -> (2.U * depth.U - 1.U))
+  val baseSeq  = Seq(0x0.U, 0x1.U)
+  val sizeSeq  = Seq(0x2.U, 0x3.U)
   
-  val mmap  = LinkedHashMap[UInt,(UInt,UInt)] ()
-  mmap += (0.U -> (0x0.U, depth.U - 1.U))
-  mmap += (1.U -> (depth.U -> (2.U * depth.U - 1.U)))
-
-  //for (i <- 0 until banks)
-  //  mmap += (i.U * depth.asUInt -> ((i.U+1.U) * depth.asUInt - 1.U))
-  
-
-  // AddrDecoder
-  val adec  = Module (new AddrDecoder(addrWidth, mmap))
+  // AddrDecoder 
+  val adec  = Module (new AddrDecoder(baseSeq, sizeSeq, addrWidth))
   adec.io.en := true.B
   adec.io.addr := wptr
 
