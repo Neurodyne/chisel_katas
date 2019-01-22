@@ -29,7 +29,7 @@ class Counter(size: Int) extends Module {
   io.out := tmp
 }
 
-sealed class AddrDecoder[A <: Data:Ordered, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:C[A], addrWidth:Int) extends Module {
+sealed class AddrDecoder[A <: Data, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:C[A], addrWidth:Int) extends Module {
 
   val bsize  = baseSeq.size 
   val ssize  = sizeSeq.size 
