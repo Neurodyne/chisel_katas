@@ -2,8 +2,7 @@
 package  my_pkg  
 
 import   chisel3._
-import   chisel3.util.{MuxCase, PopCount, Mux1H}
-import   collection.mutable.{LinkedHashMap}
+import   chisel3.util.{MuxCase, PopCount}
 
 
 class Link[A <: Data] (dType:A) extends Bundle {
@@ -30,7 +29,7 @@ class Counter(size: Int) extends Module {
   io.out := tmp
 }
 
-sealed class AddrDecoder[A <: Data, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:C[A], addrWidth:Int) extends Module {
+sealed class AddrDecoder[A <: Data:Ordered, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:C[A], addrWidth:Int) extends Module {
 
   val bsize  = baseSeq.size 
   val ssize  = sizeSeq.size 
@@ -43,14 +42,20 @@ sealed class AddrDecoder[A <: Data, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:
     val sel     = Output(Vec(bsize,Bool()))  // $onehot0 selector
   })
 
-  def inside():Bool = {
+  def inside[A](range:(A,A))(addr:A):Bool = {
     import scala.math.Ordered._
-    true.B
+    //val res  = range._2 >= range._1
+    //res
+    true.B 
   }
-
-  baseSeq zip io.sel foreach { case(base, port) =>
+ 
+  // Combine sequences to a Seq of Tupples, kind of a Map
+  val ranges  = baseSeq zip sizeSeq
+  
+  // Check inputs and assign selector
+  ranges zip io.sel foreach { case(range, port) =>
     
-    when (inside()) {
+    when (inside(range)(io.addr)) {
       port := true.B
     }
     .otherwise {
@@ -59,7 +64,7 @@ sealed class AddrDecoder[A <: Data, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:
     
   } 
 
-  // $onehot0 output encoding check
-  //assert (PopCount(io.sel) <= 1.U, "Invalid addr decoding")
+  // $onehot0 output encoding check. This helps to validate input data vs elaboration params
+  assert (PopCount(io.sel) <= 1.U, "Invalid addr decoding")
 }
 
