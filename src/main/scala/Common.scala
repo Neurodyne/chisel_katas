@@ -29,7 +29,18 @@ class Counter(size: Int) extends Module {
   io.out := tmp
 }
 
-sealed class AddrDecoder[A <: Data, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:C[A], addrWidth:Int) extends Module {
+trait Ord[A] {
+  def <=(a:A,b:A):A
+}
+
+object Ord {
+  implicit val UIntOrd:Ord[UInt] = new Ord[UInt] {
+    def <= (a:UInt, b:UInt):Bool = a < b
+  }
+}
+
+
+sealed class AddrDecoder[A <: UInt] (baseSeq:Seq[A], sizeSeq:Seq[A], addrWidth:Int) extends Module {
 
   val bsize  = baseSeq.size 
   val ssize  = sizeSeq.size 
@@ -42,11 +53,10 @@ sealed class AddrDecoder[A <: Data, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:
     val sel     = Output(Vec(bsize,Bool()))  // $onehot0 selector
   })
 
-  def inside[A](range:(A,A))(addr:A):Bool = {
-    import scala.math.Ordered._
-    //val res  = range._2 >= range._1
-    //res
-    true.B 
+  def inside[A <:UInt](range:(A,A))(addr:UInt):Bool = {
+    
+    val res = (addr >= range._1 ) && ( addr < range._1 + range._2)
+    res.asBool
   }
  
   // Combine sequences to a Seq of Tupples, kind of a Map
@@ -66,5 +76,9 @@ sealed class AddrDecoder[A <: Data, C[_] <: Iterable[_]] (baseSeq:C[A], sizeSeq:
 
   // $onehot0 output encoding check. This helps to validate input data vs elaboration params
   assert (PopCount(io.sel) <= 1.U, "Invalid addr decoding")
+}
+
+object UIntOrdering {
+  implicit def lt(a:UInt, b:UInt):Bool = a < b
 }
 

@@ -32,8 +32,6 @@ class Vrf[T <: Data] (dType:T, banks:Int, addrWidth:Int) extends Module {
   // RAM banks
   val mem  = Seq.fill(banks) { SyncReadMem(depth, dType) }
 
-  //val mmap  = Map ( 0x0.U -> 0x1.U, 
-  //                  0x2.U -> 0x3.U)
   val baseSeq  = Seq(0x0.U, 0x1.U)
   val sizeSeq  = Seq(0x2.U, 0x3.U)
   
@@ -47,8 +45,8 @@ class Vrf[T <: Data] (dType:T, banks:Int, addrWidth:Int) extends Module {
 
   // WR logic
   mem.zipWithIndex map { case (bank,idx) => 
-    //when (sel(idx)) {
-    when (true.B) {
+    when (sel(idx)) {
+    //when (true.B) {
       bank.write (wptr, in.bits.data)
     }
   }
